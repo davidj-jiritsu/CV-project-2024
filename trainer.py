@@ -61,12 +61,32 @@ class Trainer:
 
         for batch_idx, (inputs, targets) in enumerate(train_dataloader):
             """INSERT YOUR CODE HERE."""
+            inputs, targets = inputs.to(device), targets.to(device)
+            self.optimizer.zero_grad()  # Zero the gradients
+            
+            outputs = self.model(inputs)  # Forward pass
+            loss = self.criterion(outputs, targets)  # Compute loss
+            loss.backward()  # Backward pass
+            self.optimizer.step()  # Update model parameters
+
+            total_loss += loss.item() * inputs.size(0)  # Update total loss
+            
+            # Compute accuracy
+            _, predicted = torch.max(outputs, 1)
+            correct_labeled_samples += (predicted == targets).sum().item()
+            nof_samples += targets.size(0)
+            avg_loss = total_loss / nof_samples
+            accuracy = 100.0 * correct_labeled_samples / nof_samples
             if batch_idx % print_every == 0 or \
                     batch_idx == len(train_dataloader) - 1:
+                avg_loss = total_loss / nof_samples
+                accuracy = 100.0 * correct_labeled_samples / nof_samples
                 print(f'Epoch [{self.epoch:03d}] | Loss: {avg_loss:.3f} | '
                       f'Acc: {accuracy:.2f}[%] '
                       f'({correct_labeled_samples}/{nof_samples})')
-
+        
+        avg_loss = total_loss / nof_samples
+        accuracy = 100.0 * correct_labeled_samples / nof_samples
         return avg_loss, accuracy
 
     def evaluate_model_on_dataloader(
@@ -93,6 +113,24 @@ class Trainer:
 
         for batch_idx, (inputs, targets) in enumerate(dataloader):
             """INSERT YOUR CODE HERE."""
+            inputs, targets = inputs.to(device), targets.to(device)
+
+            # Compute a forward pass under a torch.no_grad() context manager
+            with torch.no_grad():
+                outputs = self.model(inputs)
+                loss = self.criterion(outputs, targets)
+
+            # Update total loss for average loss calculation
+            total_loss += loss.item() * inputs.size(0)
+
+            # Compute accuracy
+            _, predicted = torch.max(outputs, 1)
+            correct_labeled_samples += (predicted == targets).sum().item()
+            nof_samples += targets.size(0)
+
+            # Update average loss and accuracy for printing
+            avg_loss = total_loss / nof_samples
+            accuracy = 100.0 * correct_labeled_samples / nof_samples
             if batch_idx % print_every == 0 or batch_idx == len(dataloader) - 1:
                 print(f'Epoch [{self.epoch:03d}] | Loss: {avg_loss:.3f} | '
                       f'Acc: {accuracy:.2f}[%] '
