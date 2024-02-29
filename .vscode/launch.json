@@ -18,7 +18,53 @@
       "request": "launch",
       "program": "${workspaceFolder}/train_main.py",
       "console": "integratedTerminal",
-      "justMyCode": true
+      "justMyCode": true,
+      "args": [
+        "-d",
+        "fakes_dataset",
+        "-m",
+        "SimpleNet",
+        "--lr",
+        "0.001",
+        "-b",
+        "32",
+        "-e",
+        "5",
+        "-o",
+        "Adam"
+      ]
+    },
+    {
+      "name": "plot_accuracy_and_loss.py",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/plot_accuracy_and_loss.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": [
+        "-j",
+        "out/fakes_dataset_SimpleNet_Adam.json",
+        "-d",
+        "fakes_dataset",
+        "-m",
+        "SimpleNet"
+      ]
+    },
+    {
+      "name": "numerical_analysis.py",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/numerical_analysis.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": [
+        "-cpp",
+        "checkpoints/fakes_dataset_SimpleNet_Adam.pt",
+        "-d",
+        "fakes_dataset",
+        "-m",
+        "SimpleNet"
+      ]
     }
   ]
 }
